@@ -1,0 +1,104 @@
+{
+  "items": {
+    "total": 1327,
+    "per_page": 30,
+    "current_page": 1,
+    "last_page": 45,
+    "next_page_url": "/media/api/v1/newslist/category/headline?limit=30&startAt=1752681600&endAt=1753631999&page=2",
+    "prev_page_url": null,
+    "from": 1,
+    "to": 30,
+    "data": [
+      {
+        "newsId": 6078079,
+        "title": "宇樹科技推出低於6000美元人形機器人R1！價格創新低掀市場震撼",
+        "content": "&lt;p&gt;中國機器人新創公司宇樹科技正在推出全球首批，售價低於 6,000 美元的人形機器人之一，大幅降低了入門價格，預計這款機器人將發展成為適用於工作場所和家庭的多功能 AI 機器浪潮。&lt;/p&gt;\n\n&lt;p&gt;根據《彭博》報導，宇樹科技於週五（25 日）宣布，其新 R1 機器人起價為 39,900 元人民幣（約 5,900 美元）。該公司在微信上發布的影片中表示，這款人形機器人重量僅 25 公斤，擁有 26 個關節。它配備了多模態 AI，包括語音和圖像辨識。&lt;/p&gt;\n\n&lt;p&gt;R1 的推出，正值中國本週末於上海舉行的「世界人工智慧大會（WAIC）」，該會匯聚了創業家、政府官員與投資人，致力於推動 AI 與實體機器人技術的深度融合。&lt;/p&gt;\n\n&lt;p&gt;過去幾十年，美國公司如波士頓動力在人形機器人領域占據領導地位。如今，中國新創正加緊腳步，開發工業、家庭甚至軍事用途的人形機器人，價格策略已經成為其快速普及的關鍵。&lt;/p&gt;\n\n&lt;p&gt;宇樹科技早前推出的 G1 人形機器人，曾廣泛應用於研究機構與學校，售價為 1.6 萬美元。而其更高階、體型更大的 H1 版本則超過 9 萬美元。相較之下，R1 的五位數價格讓市場震驚。&lt;/p&gt;\n\n&lt;p&gt;宇樹科技競爭對手優必選 (&lt;a data-symbol-template=&quot;HKS:09880:STOCK:COMMON&quot; href=&quot;#&quot;&gt;09880-HK&lt;/a&gt;) 最近也表示，計劃今年推出一款售價 2 萬美元的人形機器人，可作為家庭伴侶，並尋求將業務拓展到工廠以外的領域。&lt;/p&gt;\n\n&lt;p&gt;如果 R1 能如宇樹科技宣傳所言正常運作，將成為人形機器人產業的一項里程碑，尤其是在複雜的人形機器人領域。&lt;/p&gt;\n\n&lt;p&gt;根據摩根士丹利研究部估計，2024 年，最先進的人形機器人的成本約為 20 萬美元。&lt;/p&gt;\n\n&lt;p&gt;宇樹科技執行長王興興曾在今年 2 月與阿里巴巴 (&lt;a data-symbol-template=&quot;HKS:09988:STOCK:COMMON&quot; href=&quot;#&quot;&gt;09988-HK&lt;/a&gt;) 創辦人馬雲、騰訊控股 (&lt;a data-symbol-template=&quot;HKS:00700:STOCK:COMMON&quot; href=&quot;#&quot;&gt;00700-HK&lt;/a&gt;) 董事長馬化騰等中國科技領袖一同出席與國家主席習近平的會晤，使這家新創公司一舉成名。&lt;/p&gt;\n",
+        "hasCoverPhoto": 1,
+        "isIndex": 1,
+        "summary": "中國新創宇樹科技發布人形機器人 R1，起價僅人民幣 39900 元（約 5900 美元），價格大幅低於市場平均，標誌著人形機器人普及的新時代。此舉引發全球關注中國機器人技術的快速發展。",
+        "isCategoryHeadline": 1,
+        "stock": [ ],
+        "video": "",
+        "payment": 0,
+        "feature": 0,
+        "otherProduct": [
+          "HKS:09880:STOCK:COMMON",
+          "HKS:09988:STOCK:COMMON",
+          "HKS:00700:STOCK:COMMON",
+          "FX:CNYUSD:FOREX:COMMON"
+        ],
+        "source": null,
+        "isOutsource": 0,
+        "keyword": [
+          "宇樹科技",
+          "人形機器人",
+          "機器人",
+          "價格",
+          "R1",
+          "低價",
+          "TOP"
+        ],
+        "is24h": 1,
+        "publishAt": 1753597806,
+        "coverSrc": {
+          "xs": {
+            "src": "https://cimg.cnyes.cool/prod/news/6078079/xs/e1cf2a111d17366e5ccb326c6a866b48.jpg",
+            "width": 100,
+            "height": 56
+          },
+          "s": {
+            "src": "https://cimg.cnyes.cool/prod/news/6078079/s/e1cf2a111d17366e5ccb326c6a866b48.jpg",
+            "width": 180,
+            "height": 101
+          },
+          "m": {
+            "src": "https://cimg.cnyes.cool/prod/news/6078079/m/e1cf2a111d17366e5ccb326c6a866b48.jpg",
+            "width": 380,
+            "height": 214
+          },
+          "l": {
+            "src": "https://cimg.cnyes.cool/prod/news/6078079/l/e1cf2a111d17366e5ccb326c6a866b48.jpg",
+            "width": 640,
+            "height": 360
+          },
+          "xl": {
+            "src": "https://cimg.cnyes.cool/prod/news/6078079/xl/e1cf2a111d17366e5ccb326c6a866b48.jpg",
+            "width": 960,
+            "height": 539
+          },
+          "xxl": {
+            "src": "https://cimg.cnyes.cool/prod/news/6078079/xxl/e1cf2a111d17366e5ccb326c6a866b48.jpg",
+            "width": 1080,
+            "height": 607
+          }
+        },
+        "abTesting": null,
+        "categoryId": 856,
+        "categoryName": "科技",
+        "columnists": null,
+        "fundCategoryAbbr": [ ],
+        "etf": [ ],
+        "fbShare": 0,
+        "fbComment": 0,
+        "fbCommentPluginCount": 0,
+        "market": [
+          {
+            "code": "09880",
+            "name": "優必選",
+            "symbol": "HKS:09880:STOCK"
+          },
+          {
+            "code": "09988",
+            "name": "阿里巴巴－ＳＷ",
+            "symbol": "HKS:09988:STOCK"
+          },
+          {
+            "code": "00700",
+            "name": "騰訊控股",
+            "symbol": "HKS:00700:STOCK"
+          }
+        ]
+      }
+    ]
+  }
+}
