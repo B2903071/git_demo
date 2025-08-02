@@ -1,284 +1,282 @@
-{
- "cells": [
-  {
-   "cell_type": "code",
-   "execution_count": 10,
-   "id": "a287b040-336b-4441-89f8-a09f3ad61f67",
-   "metadata": {},
-   "outputs": [
+import json
+import pandas as pd
+import os
+import re
+
+def fix_json_trailing_commas(json_string):
+    """修復 JSON 中的尾隨逗號問題"""
+    # 移除物件中最後一個屬性後的逗號
+    json_string = re.sub(r',(\s*})', r'\1', json_string)
+    # 移除陣列中最後一個元素後的逗號
+    json_string = re.sub(r',(\s*])', r'\1', json_string)
+    return json_string
+
+def advanced_json_fix(json_string):
+    """進階 JSON 修復功能"""
+    # 移除多餘的空白和換行
+    lines = json_string.split('\n')
+    cleaned_lines = []
+    
+    for line in lines:
+        stripped = line.strip()
+        if stripped and not stripped.startswith('//'):  # 移除空行和註釋
+            cleaned_lines.append(stripped)
+    
+    # 重新組合
+    content = ' '.join(cleaned_lines)
+    
+    # 修復尾隨逗號
+    content = fix_json_trailing_commas(content)
+    
+    # 確保正確關閉
+    open_braces = content.count('{')
+    close_braces = content.count('}')
+    open_brackets = content.count('[')
+    close_brackets = content.count(']')
+    
+    # 添加缺失的括號
+    if open_braces > close_braces:
+        content += '}' * (open_braces - close_braces)
+    if open_brackets > close_brackets:
+        content += ']' * (open_brackets - close_brackets)
+    
+    return content
+
+def extract_news_data(json_data):
+    """
+    从JSON数据中提取新闻ID、标题和摘要
+    """
+    try:
+        # 清理並解析JSON数据
+        json_data = json_data.strip()
+        
+        # 使用進階修復功能
+        json_data = advanced_json_fix(json_data)
+        
+        data = json.loads(json_data)
+        print(f"✅ JSON 解析成功，頂級鍵: {list(data.keys())}")
+        
+        news_list = []
+        
+        # 检查JSON结构
+        if 'items' in data and 'data' in data['items']:
+            news_items = data['items']['data']
+            print(f"📰 找到 {len(news_items)} 條新聞項目")
+            
+            # 遍历每条新闻
+            for idx, item in enumerate(news_items, 1):
+                print(f"🔍 處理第 {idx} 條新聞...")
+                
+                # 檢查必要欄位
+                required_fields = ['newsId', 'title', 'summary']
+                missing_fields = [field for field in required_fields if field not in item]
+                
+                if not missing_fields:
+                    news_info = {
+                        'newsId': str(item['newsId']),
+                        'title': item['title'].strip(),
+                        'summary': item['summary'].strip(),
+                        'publishAt': item.get('publishAt', ''),
+                        'categoryName': item.get('categoryName', '未分類'),
+                        'link': f"https://news.cnyes.com/news/id/{item['newsId']}"
+                    }
+                    news_list.append(news_info)
+                    print(f"✅ 成功提取: {item['title'][:50]}...")
+                else:
+                    print(f"❌ 第 {idx} 條新聞缺少欄位: {missing_fields}")
+                    print(f"   可用欄位: {list(item.keys())}")
+        else:
+            print(f"❌ JSON結構不符合預期")
+            print(f"   頂級鍵: {list(data.keys())}")
+            
+            # 嘗試其他可能的結構
+            if 'data' in data and isinstance(data['data'], list):
+                print("🔄 嘗試直接從 'data' 陣列提取...")
+                for item in data['data']:
+                    if all(field in item for field in ['newsId', 'title', 'summary']):
+                        news_info = {
+                            'newsId': str(item['newsId']),
+                            'title': item['title'].strip(),
+                            'summary': item['summary'].strip(),
+                            'publishAt': item.get('publishAt', ''),
+                            'categoryName': item.get('categoryName', '未分類'),
+                            'link': f"https://news.cnyes.com/news/id/{item['newsId']}"
+                        }
+                        news_list.append(news_info)
+        
+        return news_list
+    
+    except json.JSONDecodeError as e:
+        print(f"❌ JSON 解析錯誤: {str(e)}")
+        print(f"   錯誤位置: 行 {getattr(e, 'lineno', '未知')}, 列 {getattr(e, 'colno', '未知')}")
+        
+        # 嘗試截取到錯誤位置前的有效部分
+        try:
+            error_pos = getattr(e, 'pos', 0)
+            if error_pos > 100:  # 如果有足夠的內容
+                # 嘗試找到最後一個完整的對象
+                truncated = json_data[:error_pos-10]  # 稍微往前一點
+                
+                # 找到最後一個完整的 }
+                last_brace = truncated.rfind('}')
+                if last_brace > 0:
+                    truncated = truncated[:last_brace+1]
+                    print("🔄 嘗試使用截取的部分...")
+                    try:
+                        data = json.loads(truncated)
+                        print("✅ 截取部分解析成功！")
+                        # 重新處理截取的數據
+                        return extract_news_data(truncated)
+                    except:
+                        pass
+        except:
+            pass
+            
+        return []
+    except Exception as e:
+        print(f"❌ 其他錯誤: {e}")
+        import traceback
+        traceback.print_exc()
+        return []
+
+def read_json_file(file_path):
+    """从文件读取JSON数据"""
+    try:
+        if not os.path.exists(file_path):
+            print(f"❌ 文件 {file_path} 不存在")
+            return ""
+            
+        with open(file_path, 'r', encoding='utf-8') as file:
+            content = file.read()
+            print(f"✅ 成功讀取檔案，長度: {len(content)} 字符")
+            return content
+    except Exception as e:
+        print(f"❌ 读取文件错误: {e}")
+        return ""
+
+def validate_and_fix_json(file_path):
+    """驗證並嘗試修復 JSON 文件"""
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            content = file.read()
+        
+        print("🔧 嘗試修復 JSON 文件...")
+        
+        # 使用進階修復功能
+        fixed_content = advanced_json_fix(content)
+        
+        # 嘗試解析修復後的內容
+        try:
+            json.loads(fixed_content)
+            print(f"✅ 成功修復 JSON 格式")
+            
+            # 保存修復後的文件
+            backup_file = file_path + '.backup'
+            with open(backup_file, 'w', encoding='utf-8') as f:
+                f.write(content)
+            print(f"📋 原文件備份為: {backup_file}")
+            
+            with open(file_path, 'w', encoding='utf-8') as f:
+                f.write(fixed_content)
+            print(f"💾 已保存修復後的文件")
+            
+            return True
+        except json.JSONDecodeError as e:
+            print(f"❌ 標準修復失敗: {e}")
+            
+            # 嘗試截取修復
+            error_pos = getattr(e, 'pos', len(fixed_content))
+            if error_pos > 100:
+                print("🔄 嘗試截取修復...")
+                # 找到錯誤位置前的最後一個完整結構
+                truncated = fixed_content[:error_pos-10]
+                last_brace = truncated.rfind('}')
+                
+                if last_brace > 0:
+                    truncated = truncated[:last_brace+1]
+                    try:
+                        json.loads(truncated)
+                        print("✅ 截取修復成功")
+                        
+                        with open(file_path, 'w', encoding='utf-8') as f:
+                            f.write(truncated)
+                        return True
+                    except:
+                        pass
+            
+            return False
+        
+    except Exception as e:
+        print(f"❌ 修復過程出錯: {e}")
+        return False
+
+def main():
+    print("=== 鉅亨網新聞資料提取工具 ===\n")
+    
+    # 检查并尝试修复JSON文件
+    if os.path.exists('paste.txt'):
+        # 先嘗試讀取原文件
+        json_data = read_json_file('paste.txt')
+        
+        if json_data:
+            try:
+                # 先嘗試進階修復
+                cleaned_data = advanced_json_fix(json_data.strip())
+                json.loads(cleaned_data)
+                json_data = cleaned_data
+                print("✅ 成功修復 JSON 格式問題")
+            except json.JSONDecodeError:
+                print("🔧 檢測到 JSON 格式問題，嘗試完整修復...")
+                if validate_and_fix_json('paste.txt'):
+                    # 重新讀取修復後的文件
+                    json_data = read_json_file('paste.txt')
+                else:
+                    print("❌ 標準修復失敗，嘗試強制提取...")
+                    # 最後嘗試：直接提取可能的數據
+                    json_data = json_data.strip()
+    else:
+        print("❌ 找不到 paste.txt 文件")
+        return
+    
+    if json_data:
+        # 提取新闻数据
+        news_list = extract_news_data(json_data)
+        
+        if news_list:
+            print(f"\n🎉 成功提取 {len(news_list)} 條新聞:")
+            print("=" * 80)
+            
+            for i, news in enumerate(news_list, 1):
+                print(f"\n📰 新聞 {i}:")
+                print(f"   📋 ID: {news['newsId']}")
+                print(f"   📝 標題: {news['title']}")
+                print(f"   📄 摘要: {news['summary'][:100]}{'...' if len(news['summary']) > 100 else ''}")
+                print(f"   🏷️  分類: {news['categoryName']}")
+                print(f"   🔗 連結: {news['link']}")
+                
+            # 保存到CSV文件
+            df = pd.DataFrame(news_list)
+            output_file = 'cnyes_news_extract.csv'
+            df.to_csv(output_file, index=False, encoding='utf-8-sig')
+            print(f"\n✅ 資料已保存到 {output_file}")
+            
+            # 顯示CSV檔案資訊
+            print(f"📊 CSV檔案包含 {len(df)} 筆記錄，{len(df.columns)} 個欄位")
+            print(f"📂 欄位名稱: {', '.join(df.columns)}")
+            
+        else:
+            print("❌ 沒有提取到任何新聞資料")
+    else:
+        print("❌ 無法讀取資料")
+
+if __name__ == "__main__":
+    main()
+
+[
     {
-     "name": "stdout",
-     "output_type": "stream",
-     "text": [
-      "使用时间范围: 从 2025-06-26 14:24:39 到 2025-07-26 14:24:39\n",
-      "发送请求: https://api.cnyes.com/media/api/v1/newslist/category/headline\n",
-      "参数: {'page': 1, 'limit': 30, 'isCategoryHeadline': 1, 'startAt': 1750919079, 'endAt': 1753511079}\n",
-      "响应状态码: 200\n",
-      "JSON顶级键: ['items', 'message', 'statusCode']\n",
-      "获取到 30 条新闻\n",
-      "列名: ['newsId', 'title', 'content', 'hasCoverPhoto', 'isIndex', 'summary', 'isCategoryHeadline', 'stock', 'video', 'payment', 'feature', 'otherProduct', 'source', 'isOutsource', 'keyword', 'is24h', 'publishAt', 'coverSrc', 'abTesting', 'categoryId', 'categoryName', 'columnists', 'fundCategoryAbbr', 'etf', 'fbShare', 'fbComment', 'fbCommentPluginCount', 'market']\n",
-      "\n",
-      "新闻列表预览:\n",
-      "    newsId                                  title  \\\n",
-      "0  6077764       李強提議建全球AI合作組織！中國籲統一AI治理、美中科技角力升溫   \n",
-      "1  6077766               經濟學人：狼真的來了！加密大爆炸將顛覆金融舊秩序   \n",
-      "2  6077644  ChatGPT創建者之一 趙盛佳將擔任Meta「超級智慧實驗室」首席科學家   \n",
-      "3  6077607           〈財報前瞻〉華爾街估蘋果Q3營收略降 關稅、歐盟成關鍵字   \n",
-      "4  6077754    產量遠不如目標？馬斯克說好年底前生產5,000台 目前只產幾百台機器人   \n",
-      "\n",
-      "                                             summary  \\\n",
-      "0  中國總理李強於世界人工智慧大會（WAIC）提議成立全球 AI 合作組織，強調加強人工智慧治理...   \n",
-      "1  探索加密貨幣世界的重大轉變！從穩定幣監管法案到資產代幣化的快速崛起，本文全面解析穩定幣與代幣...   \n",
-      "2                                               None   \n",
-      "3  蘋果預計將於 7 月 31 日公布 2025 會計年度第三季 (截至 6 月底) 財報。儘管...   \n",
-      "4       特斯拉 (TSLA-US) 擎天柱（Optimus）機器人產量嚴重滯後，全年目標成泡影？   \n",
-      "\n",
-      "                                     link  \n",
-      "0  https://news.cnyes.com/news/id/6077764  \n",
-      "1  https://news.cnyes.com/news/id/6077766  \n",
-      "2  https://news.cnyes.com/news/id/6077644  \n",
-      "3  https://news.cnyes.com/news/id/6077607  \n",
-      "4  https://news.cnyes.com/news/id/6077754  \n",
-      "\n",
-      "数据已保存到 cnyes_news_20250726_142439.csv\n"
-     ]
+        "type": "command",
+        "details": {
+            "key": "python.execInTerminal"
+        }
     }
-   ],
-   "source": [
-    "import requests\n",
-    "import pandas as pd\n",
-    "import json\n",
-    "import time\n",
-    "from datetime import datetime, timedelta\n",
-    "\n",
-    "# 计算正确的时间戳\n",
-    "# 结束时间设为当前时间\n",
-    "end_time = int(time.time())\n",
-    "# 开始时间设为30天前\n",
-    "start_time = end_time - (30 * 24 * 60 * 60)  # 30天的秒数\n",
-    "\n",
-    "print(f\"使用时间范围: 从 {datetime.fromtimestamp(start_time)} 到 {datetime.fromtimestamp(end_time)}\")\n",
-    "\n",
-    "url = \"https://api.cnyes.com/media/api/v1/newslist/category/headline\"\n",
-    "payload = {\n",
-    "    \"page\": 1,  # 从第1页开始\n",
-    "    \"limit\": 30,\n",
-    "    \"isCategoryHeadline\": 1,\n",
-    "    \"startAt\": start_time,\n",
-    "    \"endAt\": end_time\n",
-    "}\n",
-    "\n",
-    "try:\n",
-    "    print(f\"发送请求: {url}\")\n",
-    "    print(f\"参数: {payload}\")\n",
-    "    \n",
-    "    res = requests.get(url, params=payload)\n",
-    "    res.raise_for_status()  # 检查HTTP响应状态\n",
-    "    \n",
-    "    print(f\"响应状态码: {res.status_code}\")\n",
-    "    \n",
-    "    # 解析JSON\n",
-    "    jd = json.loads(res.text)\n",
-    "    \n",
-    "    # 检查API响应结构\n",
-    "    print(f\"JSON顶级键: {list(jd.keys())}\")\n",
-    "    \n",
-    "    # 适应不同的JSON结构\n",
-    "    if 'items' in jd and 'data' in jd['items']:\n",
-    "        # 原始预期结构\n",
-    "        data = jd['items']['data']\n",
-    "    elif 'data' in jd and isinstance(jd['data'], list):\n",
-    "        # 数据直接在'data'键下\n",
-    "        data = jd['data']\n",
-    "    elif 'data' in jd and 'items' in jd['data']:\n",
-    "        # 嵌套结构\n",
-    "        data = jd['data']['items']\n",
-    "    else:\n",
-    "        # 其他可能的结构\n",
-    "        print(\"无法识别的数据结构，显示完整响应:\")\n",
-    "        print(jd)\n",
-    "        data = []\n",
-    "    \n",
-    "    if data:\n",
-    "        # 创建DataFrame\n",
-    "        df = pd.DataFrame(data)\n",
-    "        \n",
-    "        print(f\"获取到 {len(df)} 条新闻\")\n",
-    "        print(f\"列名: {df.columns.tolist()}\")\n",
-    "        \n",
-    "        # 选择需要的列（根据实际列名调整）\n",
-    "        columns_to_select = [col for col in ['newsId', 'title', 'summary'] if col in df.columns]\n",
-    "        \n",
-    "        if columns_to_select:\n",
-    "            df = df[columns_to_select]\n",
-    "            \n",
-    "            # 添加链接列（如果有newsId列）\n",
-    "            if 'newsId' in df.columns:\n",
-    "                df['link'] = df['newsId'].apply(lambda x: f'https://news.cnyes.com/news/id/{x}')\n",
-    "                \n",
-    "            # 显示结果\n",
-    "            print(\"\\n新闻列表预览:\")\n",
-    "            print(df.head())\n",
-    "            \n",
-    "            # 保存到CSV\n",
-    "            csv_filename = f\"cnyes_news_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv\"\n",
-    "            df.to_csv(csv_filename, index=False, encoding='utf-8-sig')\n",
-    "            print(f\"\\n数据已保存到 {csv_filename}\")\n",
-    "        else:\n",
-    "            print(\"在返回的数据中找不到所需的列\")\n",
-    "    else:\n",
-    "        print(\"没有找到新闻数据\")\n",
-    "    \n",
-    "except requests.exceptions.RequestException as e:\n",
-    "    print(f\"请求错误: {e}\")\n",
-    "except json.JSONDecodeError as e:\n",
-    "    print(f\"JSON解析错误: {e}\")\n",
-    "    print(f\"响应内容: {res.text}\")\n",
-    "except Exception as e:\n",
-    "    print(f\"其他错误: {e}\")\n",
-    "    import traceback\n",
-    "    traceback.print_exc()"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 12,
-   "id": "0eff0801-a29b-42d9-abfc-dd1da1c03bdf",
-   "metadata": {},
-   "outputs": [
-    {
-     "name": "stdout",
-     "output_type": "stream",
-     "text": [
-      "The following commands were written to file `3.py`:\n",
-      "import requests\n",
-      "import pandas as pd\n",
-      "import json\n",
-      "import time\n",
-      "from datetime import datetime, timedelta\n",
-      "\n",
-      "# 计算正确的时间戳\n",
-      "# 结束时间设为当前时间\n",
-      "end_time = int(time.time())\n",
-      "# 开始时间设为30天前\n",
-      "start_time = end_time - (30 * 24 * 60 * 60)  # 30天的秒数\n",
-      "\n",
-      "print(f\"使用时间范围: 从 {datetime.fromtimestamp(start_time)} 到 {datetime.fromtimestamp(end_time)}\")\n",
-      "\n",
-      "url = \"https://api.cnyes.com/media/api/v1/newslist/category/headline\"\n",
-      "payload = {\n",
-      "    \"page\": 1,  # 从第1页开始\n",
-      "    \"limit\": 30,\n",
-      "    \"isCategoryHeadline\": 1,\n",
-      "    \"startAt\": start_time,\n",
-      "    \"endAt\": end_time\n",
-      "}\n",
-      "\n",
-      "try:\n",
-      "    print(f\"发送请求: {url}\")\n",
-      "    print(f\"参数: {payload}\")\n",
-      "    \n",
-      "    res = requests.get(url, params=payload)\n",
-      "    res.raise_for_status()  # 检查HTTP响应状态\n",
-      "    \n",
-      "    print(f\"响应状态码: {res.status_code}\")\n",
-      "    \n",
-      "    # 解析JSON\n",
-      "    jd = json.loads(res.text)\n",
-      "    \n",
-      "    # 检查API响应结构\n",
-      "    print(f\"JSON顶级键: {list(jd.keys())}\")\n",
-      "    \n",
-      "    # 适应不同的JSON结构\n",
-      "    if 'items' in jd and 'data' in jd['items']:\n",
-      "        # 原始预期结构\n",
-      "        data = jd['items']['data']\n",
-      "    elif 'data' in jd and isinstance(jd['data'], list):\n",
-      "        # 数据直接在'data'键下\n",
-      "        data = jd['data']\n",
-      "    elif 'data' in jd and 'items' in jd['data']:\n",
-      "        # 嵌套结构\n",
-      "        data = jd['data']['items']\n",
-      "    else:\n",
-      "        # 其他可能的结构\n",
-      "        print(\"无法识别的数据结构，显示完整响应:\")\n",
-      "        print(jd)\n",
-      "        data = []\n",
-      "    \n",
-      "    if data:\n",
-      "        # 创建DataFrame\n",
-      "        df = pd.DataFrame(data)\n",
-      "        \n",
-      "        print(f\"获取到 {len(df)} 条新闻\")\n",
-      "        print(f\"列名: {df.columns.tolist()}\")\n",
-      "        \n",
-      "        # 选择需要的列（根据实际列名调整）\n",
-      "        columns_to_select = [col for col in ['newsId', 'title', 'summary'] if col in df.columns]\n",
-      "        \n",
-      "        if columns_to_select:\n",
-      "            df = df[columns_to_select]\n",
-      "            \n",
-      "            # 添加链接列（如果有newsId列）\n",
-      "            if 'newsId' in df.columns:\n",
-      "                df['link'] = df['newsId'].apply(lambda x: f'https://news.cnyes.com/news/id/{x}')\n",
-      "                \n",
-      "            # 显示结果\n",
-      "            print(\"\\n新闻列表预览:\")\n",
-      "            print(df.head())\n",
-      "            \n",
-      "            # 保存到CSV\n",
-      "            csv_filename = f\"cnyes_news_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv\"\n",
-      "            df.to_csv(csv_filename, index=False, encoding='utf-8-sig')\n",
-      "            print(f\"\\n数据已保存到 {csv_filename}\")\n",
-      "        else:\n",
-      "            print(\"在返回的数据中找不到所需的列\")\n",
-      "    else:\n",
-      "        print(\"没有找到新闻数据\")\n",
-      "    \n",
-      "except requests.exceptions.RequestException as e:\n",
-      "    print(f\"请求错误: {e}\")\n",
-      "except json.JSONDecodeError as e:\n",
-      "    print(f\"JSON解析错误: {e}\")\n",
-      "    print(f\"响应内容: {res.text}\")\n",
-      "except Exception as e:\n",
-      "    print(f\"其他错误: {e}\")\n",
-      "    import traceback\n",
-      "    traceback.print_exc()\n"
-     ]
-    }
-   ],
-   "source": [
-    "%save 3.py 10"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": None,
-   "id": "c92d7fc5-6032-4d2d-9622-85fe1ff431c2",
-   "metadata": {},
-   "outputs": [],
-   "source": []
-  }
- ],
- "metadata": {
-  "kernelspec": {
-   "display_name": "Python [conda env:anaconda3]",
-   "language": "python",
-   "name": "conda-env-anaconda3-py"
-  },
-  "language_info": {
-   "codemirror_mode": {
-    "name": "ipython",
-    "version": 3
-   },
-   "file_extension": ".py",
-   "mimetype": "text/x-python",
-   "name": "python",
-   "nbconvert_exporter": "python",
-   "pygments_lexer": "ipython3",
-   "version": "3.13.5"
-  }
- },
- "nbformat": 4,
- "nbformat_minor": 5
-}
+]
