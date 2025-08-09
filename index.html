@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B2903071 Git Demo 項目</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: system-ui, sans-serif; line-height: 1.6; color: #333; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 60px 20px; text-align: center; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 20px; }
+        .hero h1 { font-size: 3em; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        .hero p { font-size: 1.2em; opacity: 0.9; margin-bottom: 30px; }
+        .content { padding: 60px 20px; background: #f8f9fa; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; margin: 40px 0; }
+        .card { background: white; padding: 25px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); transition: transform 0.3s ease; }
+        .card:hover { transform: translateY(-5px); }
+        .card h3 { color: #667eea; margin-bottom: 15px; }
+        .tech-stack { display: flex; flex-wrap: wrap; gap: 8px; margin: 15px 0; }
+        .tech-tag { background: #e3f2fd; color: #1976d2; padding: 4px 10px; border-radius: 15px; font-size: 0.8em; }
+        .btn { display: inline-block; padding: 12px 25px; background: #667eea; color: white; text-decoration: none; border-radius: 25px; margin: 10px; transition: background 0.3s ease; }
+        .btn:hover { background: #5a67d8; }
+        .stats { text-align: center; padding: 40px 20px; background: white; }
+        .stat-item { display: inline-block; margin: 0 30px; text-align: center; }
+        .stat-number { font-size: 2.5em; font-weight: bold; color: #667eea; }
+        .footer { background: #2d3748; color: white; text-align: center; padding: 30px; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="hero">
+                <h1>🚀 Git Demo 項目</h1>
+                <p>B2903071 的 Python 開發與數據科學學習展示</p>
+                <a href="https://github.com/B2903071/git_demo" class="btn" target="_blank">📂 查看 GitHub</a>
+                <a href="#projects" class="btn">📋 瀏覽項目</a>
+            </div>
+        </div>
+    </header>
+
+    <section class="content">
+        <div class="container">
+            <h2 style="text-align: center; margin-bottom: 40px;">📁 項目文件</h2>
+            
+            <div class="grid" id="projects">
+                <div class="card">
+                    <h3>📊 1.py - Pandas 基礎</h3>
+                    <p>使用 Pandas 處理台灣城市數據，展示基礎數據分析技能。</p>
+                    <div class="tech-stack">
+                        <span class="tech-tag">Python</span>
+                        <span class="tech-tag">Pandas</span>
+                        <span class="tech-tag">數據分析</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>💰 3.py - 金融數據處理</h3>
+                    <p>金融新聞 API 數據處理，展示高級數據抓取和分析能力。</p>
+                    <div class="tech-stack">
+                        <span class="tech-tag">Python</span>
+                        <span class="tech-tag">API</span>
+                        <span class="tech-tag">金融數據</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>📈 cnyes_news_scraper_final.py</h3>
+                    <p>專業的鉅亨網新聞爬蟲程序，展示高級爬蟲技術。</p>
+                    <div class="tech-stack">
+                        <span class="tech-tag">Python</span>
+                        <span class="tech-tag">爬蟲</span>
+                        <span class="tech-tag">新聞數據</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>📓 Jupyter Notebook</h3>
+                    <p>互動式開發環境，用於數據探索和可視化分析。</p>
+                    <div class="tech-stack">
+                        <span class="tech-tag">Jupyter</span>
+                        <span class="tech-tag">交互式</span>
+                        <span class="tech-tag">可視化</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>📄 學術報告 (report.pdf)</h3>
+                    <p>完整的研究報告文檔，展示學術寫作和研究能力。</p>
+                    <div class="tech-stack">
+                        <span class="tech-tag">研究</span>
+                        <span class="tech-tag">報告</span>
+                        <span class="tech-tag">PDF</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>📂 pushed_to_main.md</h3>
+                    <p>記錄推送到 main 分支的測試文件，展示 Git 操作技能。</p>
+                    <div class="tech-stack">
+                        <span class="tech-tag">Git</span>
+                        <span class="tech-tag">版本控制</span>
+                        <span class="tech-tag">Markdown</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="stats">
+        <div class="container">
+            <h2 style="margin-bottom: 40px;">📈 項目統計</h2>
+            <div class="stat-item">
+                <div class="stat-number">6+</div>
+                <div>主要文件</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">Python</div>
+                <div>主要語言</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">2025</div>
+                <div>創建年份</div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>🎓 B2903071 | 中國文化大學 | 2025</p>
+            <p>由 GitHub Pages 托管 | 最後更新: <span id="date"></span></p>
+            <script>
+                document.getElementById("date").textContent = new Date().toLocaleDateString("zh-TW");
+            </script>
+        </div>
+    </footer>
+</body>
+</html>
