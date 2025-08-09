@@ -1,0 +1,36 @@
+def read_json_file(file_path):
+    """从文件读取JSON数据"""
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            return file.read()
+    except Exception as e:
+        print(f"读取文件错误: {e}")
+        return ""
+
+# 主函数
+def main():
+    # 从文件读取JSON数据
+    # 如果直接使用变量中的数据，可以替换为json_data = "你的JSON字符串"
+    json_data = read_json_file('paste.txt')
+    
+    if json_data:
+        # 提取新闻数据
+        news_list = extract_news_data(json_data)
+        
+        # 显示提取的数据
+        print(f"共提取 {len(news_list)} 条新闻")
+        for i, news in enumerate(news_list, 1):
+            print(f"\n新闻 {i}:")
+            print(f"ID: {news['newsId']}")
+            print(f"标题: {news['title']}")
+            print(f"摘要: {news['summary']}")
+            
+        # 将提取的数据保存到CSV文件
+        import pandas as pd
+        df = pd.DataFrame(news_list)
+        output_file = 'cnyes_news_extract.csv'
+        df.to_csv(output_file, index=False, encoding='utf-8-sig')
+        print(f"\n数据已保存到 {output_file}")
+
+if __name__ == "__main__":
+    main()
