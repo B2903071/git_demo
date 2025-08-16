@@ -1,0 +1,12 @@
+name: Deploy App                                    # 設定 workflow 名稱為 Deploy App
+on:                                                 # 設定 workflow 的觸發條件
+  workflow_dispatch:                                # 允許手動觸發 workflow
+    inputs:                                         # 定義手動觸發時可傳入的參數
+      version:                                      # version 參數
+        required: true                              # version 參數必填
+        type: string                                # version 參數型態為字串
+jobs:                                               # 定義所有工作（jobs）
+  call-build:                                       # 工作名稱，這裡叫 call-build
+    uses: B2903071/git_demo/.github/workflows/build.yml@main  # 呼叫自己 repo 的 build workflow（main 分支）
+    with:                                           # 傳遞參數給被呼叫的 workflow
+      version: ${{ inputs.version }}                # 傳入 version 參數（來自手動輸入）
