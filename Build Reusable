@@ -1,12 +1,12 @@
-name: Build Reusable
-on:
-  workflow_call:
-    inputs:
-      version:
-        required: true
-        type: string
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo "Building version ${{ inputs.version }}"
+name: Build Reusable                       # 設定 workflow 的名稱為 Build Reusable
+on:                                       # 設定 workflow 的觸發條件
+  workflow_call:                          # 此 workflow 可被其他 workflow 呼叫（可重複利用）
+    inputs:                               # 呼叫時可傳入的參數設定
+      version:                            # 定義一個名為 version 的參數
+        required: true                    # version 參數必須提供
+        type: string                      # version 參數型態為字串
+jobs:                                     # 定義所有 jobs
+  build:                                  # 定義一個名為 build 的 job
+    runs-on: ubuntu-latest                # 此 job 執行在最新版本的 Ubuntu runner
+    steps:                                # 設定步驟
+      - run: echo "Building version ${{ inputs.version }}"  # 輸出正在建置的版本
